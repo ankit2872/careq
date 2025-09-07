@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareQ - Healthcare Queue Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.4) 0%, transparent 60%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 60%),
+                radial-gradient(circle at 40% 40%, rgba(240, 147, 251, 0.3) 0%, transparent 60%),
+                radial-gradient(circle at 60% 60%, rgba(102, 126, 234, 0.2) 0%, transparent 60%);
+            pointer-events: none;
+            animation: backgroundShift 20s ease-in-out infinite;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            25% { transform: translateX(-20px) translateY(-10px); }
+            50% { transform: translateX(20px) translateY(10px); }
+            75% { transform: translateX(-10px) translateY(20px); }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(30px);
+            border-radius: 32px;
+            box-shadow: 
+                0 32px 64px rgba(0,0,0,0.2),
+                0 0 0 1px rgba(255, 255, 255, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            padding: 80px 60px;
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            animation: slideUp 1s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            font-size: 5em;
+            margin-bottom: 30px;
+            animation: float 3s ease-in-out infinite;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-15px) rotate(2deg);
+            }
+        }
+
+        h1 {
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 4em;
+            margin-bottom: 20px;
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            animation: textGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes textGlow {
+            from {
+                filter: drop-shadow(0 0 5px rgba(102, 126, 234, 0.3));
+            }
+            to {
+                filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.6));
+            }
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.3em;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .feature {
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-radius: 20px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .feature:hover::before {
+            left: 100%;
+        }
+
+        .feature:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 
+                0 20px 40px rgba(0,0,0,0.1),
+                0 0 0 1px rgba(102, 126, 234, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .feature h3 {
+            color: #333;
+            font-size: 1.4em;
+            margin-bottom: 10px;
+        }
+
+        .feature p {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 18px 36px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-block;
+            min-width: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 40px 0;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .language-selector {
+            margin: 30px 0;
+        }
+
+        .language-btn {
+            padding: 10px 20px;
+            margin: 0 10px;
+            border: 2px solid #e1e5e9;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+
+        .language-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .language-btn:hover {
+            border-color: #667eea;
+        }
+
+        .ai-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+            padding: 0 20px;
+        }
+
+        .ai-feature-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb);
+        }
+
+        .ai-feature-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .ai-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .ai-content h3 {
+            color: white;
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .ai-content p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .ai-predictor {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .ai-predictor h3 {
+            color: white;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .predictor-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1em;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+        }
+
+        .prediction-result {
+            margin-top: 25px;
+        }
+
+        .prediction-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .prediction-card h4 {
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .prediction-details {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .prediction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .prediction-item:last-child {
+            border-bottom: none;
+        }
+
+        .prediction-value {
+            font-weight: 700;
+            color: #4ecdc4;
+            font-size: 1.1em;
+        }
+
+        .prediction-insights {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(78, 205, 196, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #4ecdc4;
+        }
+
+        .prediction-insights h5 {
+            color: white;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        .prediction-insights ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .prediction-insights li {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 5px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .prediction-insights li::before {
+            content: "•";
+            color: #4ecdc4;
+            position: absolute;
+            left: 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 20px;
+            }
+
+            h1 {
+                font-size: 2.5em;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🏥</div>
+        <h1 id="main-title">CareQ</h1>
+        <p class="subtitle" id="subtitle">AI-Powered Healthcare Queue Management System</p>
+        
+        <!-- AI Features Showcase -->
+        <div class="ai-showcase">
+            <div class="ai-feature-card">
+                <div class="ai-icon">🧠</div>
+                <div class="ai-content">
+                    <h3 id="ai-prediction-title">AI Wait Time Prediction</h3>
+                    <p id="ai-prediction-desc">Advanced machine learning algorithms predict accurate wait times</p>
+                </div>
+            </div>
+            <div class="ai-feature-card">
+                <div class="ai-icon">🤖</div>
+                <div class="ai-content">
+                    <h3 id="ai-triage-title">Smart Triage System</h3>
+                    <p id="ai-triage-desc">AI-powered priority assessment for optimal patient care</p>
+                </div>
+            </div>
+            <div class="ai-feature-card">
+                <div class="ai-icon">📊</div>
+                <div class="ai-content">
+                    <h3 id="ai-analytics-title">Real-time Analytics</h3>
+                    <p id="ai-analytics-desc">Live insights and predictive analytics for better management</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="language-selector">
+            <button class="language-btn active" data-lang="en">English</button>
+            <button class="language-btn" data-lang="hi">हिन्दी</button>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <h3 id="feature1-title">Quick Registration</h3>
+                <p id="feature1-desc">Get your token in minutes with our streamlined registration process</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📱</div>
+                <h3 id="feature2-title">Real-time Updates</h3>
+                <p id="feature2-desc">Receive instant notifications about your queue position and wait time</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎯</div>
+                <h3 id="feature3-title">Smart Triage</h3>
+                <p id="feature3-desc">AI-powered priority assessment ensures urgent cases are seen first</p>
+            </div>
+        </div>
+
+        <div class="stats" id="stats" style="display: none;">
+            <div class="stat">
+                <div class="stat-number" id="queue-count">0</div>
+                <div class="stat-label" id="queue-label">In Queue</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="avg-wait">0</div>
+                <div class="stat-label" id="avg-wait-label">AI Predicted Wait (min)</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="ai-confidence">0%</div>
+                <div class="stat-label" id="ai-confidence-label">AI Confidence</div>
+            </div>
+        </div>
+        
+        <!-- AI Wait Time Predictor -->
+        <div class="ai-predictor" id="ai-predictor" style="display: none;">
+            <h3 id="predictor-title">AI Wait Time Predictor</h3>
+            <div class="predictor-form">
+                <div class="form-group">
+                    <label id="symptoms-label">Symptoms (comma-separated):</label>
+                    <input type="text" id="symptoms-input" placeholder="fever, headache, cough">
+                </div>
+                <div class="form-group">
+                    <label id="age-label">Age:</label>
+                    <input type="number" id="age-input" placeholder="25" min="1" max="120">
+                </div>
+                <div class="form-group">
+                    <label id="severity-label">Severity Level:</label>
+                    <select id="severity-select">
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Urgent">Urgent</option>
+                        <option value="Critical">Critical</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="predictWaitTime()" id="predict-btn">
+                    <i class="fas fa-brain"></i> Predict Wait Time
+                </button>
+            </div>
+            <div class="prediction-result" id="prediction-result" style="display: none;">
+                <div class="prediction-card">
+                    <h4 id="prediction-title">AI Prediction Result</h4>
+                    <div class="prediction-details">
+                        <div class="prediction-item">
+                            <span id="predicted-time-label">Predicted Wait Time:</span>
+                            <span class="prediction-value" id="predicted-time">0 minutes</span>
+                        </div>
+                        <div class="prediction-item">
+                            <span id="confidence-label">Confidence Score:</span>
+                            <span class="prediction-value" id="confidence-score">0%</span>
+                        </div>
+                        <div class="prediction-insights" id="prediction-insights">
+                            <!-- AI insights will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="/patient-form" class="btn btn-primary" id="register-btn">Register as Patient</a>
+            <a href="/admin-dashboard" class="btn btn-secondary" id="admin-btn">Advanced Admin Dashboard</a>
+            <a href="/admin" class="btn btn-secondary" id="simple-admin-btn">Simple Admin</a>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+        let selectedLanguage = 'en';
+
+        // Language texts
+        const texts = {
+            en: {
+                title: "CareQ",
+                subtitle: "Smart Healthcare Queue Management System",
+                feature1Title: "Quick Registration",
+                feature1Desc: "Get your token in minutes with our streamlined registration process",
+                feature2Title: "Real-time Updates",
+                feature2Desc: "Receive instant notifications about your queue position and wait time",
+                feature3Title: "Smart Triage",
+                feature3Desc: "AI-powered priority assessment ensures urgent cases are seen first",
+                registerBtn: "Register as Patient",
+                adminBtn: "Advanced Admin Dashboard",
+                simpleAdminBtn: "Simple Admin",
+                queueLabel: "In Queue",
+                avgWaitLabel: "AI Predicted Wait (min)",
+                aiConfidenceLabel: "AI Confidence",
+                aiPredictionTitle: "AI Wait Time Prediction",
+                aiPredictionDesc: "Advanced machine learning algorithms predict accurate wait times",
+                aiTriageTitle: "Smart Triage System",
+                aiTriageDesc: "AI-powered priority assessment for optimal patient care",
+                aiAnalyticsTitle: "Real-time Analytics",
+                aiAnalyticsDesc: "Live insights and predictive analytics for better management",
+                predictorTitle: "AI Wait Time Predictor",
+                symptomsLabel: "Symptoms (comma-separated):",
+                ageLabel: "Age:",
+                severityLabel: "Severity Level:",
+                predictBtn: "Predict Wait Time",
+                predictionTitle: "AI Prediction Result",
+                predictedTimeLabel: "Predicted Wait Time:",
+                confidenceLabel: "Confidence Score:"
+            },
+            hi: {
+                title: "CareQ",
+                subtitle: "स्मार्ट हेल्थकेयर कतार प्रबंधन प्रणाली",
+                feature1Title: "त्वरित पंजीकरण",
+                feature1Desc: "हमारी सुव्यवस्थित पंजीकरण प्रक्रिया के साथ मिनटों में अपना टोकन प्राप्त करें",
+                feature2Title: "रियल-टाइम अपडेट",
+                feature2Desc: "अपनी कतार की स्थिति और प्रतीक्षा समय के बारे में तुरंत सूचनाएं प्राप्त करें",
+                feature3Title: "स्मार्ट ट्राइएज",
+                feature3Desc: "AI-संचालित प्राथमिकता मूल्यांकन सुनिश्चित करता है कि जरूरी मामलों को पहले देखा जाए",
+                registerBtn: "रोगी के रूप में पंजीकरण करें",
+                adminBtn: "उन्नत एडमिन डैशबोर्ड",
+                simpleAdminBtn: "सरल एडमिन",
+                queueLabel: "कतार में",
+                avgWaitLabel: "AI भविष्यवाणी प्रतीक्षा (मिनट)",
+                aiConfidenceLabel: "AI आत्मविश्वास",
+                aiPredictionTitle: "AI प्रतीक्षा समय भविष्यवाणी",
+                aiPredictionDesc: "उन्नत मशीन लर्निंग एल्गोरिदम सटीक प्रतीक्षा समय की भविष्यवाणी करते हैं",
+                aiTriageTitle: "स्मार्ट ट्राइएज सिस्टम",
+                aiTriageDesc: "इष्टतम रोगी देखभाल के लिए AI-संचालित प्राथमिकता मूल्यांकन",
+                aiAnalyticsTitle: "रियल-टाइम एनालिटिक्स",
+                aiAnalyticsDesc: "बेहतर प्रबंधन के लिए लाइव अंतर्दृष्टि और भविष्यवाणी एनालिटिक्स",
+                predictorTitle: "AI प्रतीक्षा समय भविष्यवक्ता",
+                symptomsLabel: "लक्षण (अल्पविराम से अलग):",
+                ageLabel: "आयु:",
+                severityLabel: "गंभीरता स्तर:",
+                predictBtn: "प्रतीक्षा समय भविष्यवाणी करें",
+                predictionTitle: "AI भविष्यवाणी परिणाम",
+                predictedTimeLabel: "भविष्यवाणी प्रतीक्षा समय:",
+                confidenceLabel: "आत्मविश्वास स्कोर:"
+            }
+        };
+
+        // Initialize the page
+        function init() {
+            updateLanguage();
+            setupEventListeners();
+            loadStats();
+        }
+
+        // Update language
+        function updateLanguage() {
+            const t = texts[selectedLanguage];
+            document.getElementById('main-title').textContent = t.title;
+            document.getElementById('subtitle').textContent = t.subtitle;
+            document.getElementById('feature1-title').textContent = t.feature1Title;
+            document.getElementById('feature1-desc').textContent = t.feature1Desc;
+            document.getElementById('feature2-title').textContent = t.feature2Title;
+            document.getElementById('feature2-desc').textContent = t.feature2Desc;
+            document.getElementById('feature3-title').textContent = t.feature3Title;
+            document.getElementById('feature3-desc').textContent = t.feature3Desc;
+            document.getElementById('register-btn').textContent = t.registerBtn;
+            document.getElementById('admin-btn').textContent = t.adminBtn;
+            document.getElementById('simple-admin-btn').textContent = t.simpleAdminBtn;
+            document.getElementById('queue-label').textContent = t.queueLabel;
+            document.getElementById('avg-wait-label').textContent = t.avgWaitLabel;
+            document.getElementById('ai-confidence-label').textContent = t.aiConfidenceLabel;
+            document.getElementById('ai-prediction-title').textContent = t.aiPredictionTitle;
+            document.getElementById('ai-prediction-desc').textContent = t.aiPredictionDesc;
+            document.getElementById('ai-triage-title').textContent = t.aiTriageTitle;
+            document.getElementById('ai-triage-desc').textContent = t.aiTriageDesc;
+            document.getElementById('ai-analytics-title').textContent = t.aiAnalyticsTitle;
+            document.getElementById('ai-analytics-desc').textContent = t.aiAnalyticsDesc;
+            document.getElementById('predictor-title').textContent = t.predictorTitle;
+            document.getElementById('symptoms-label').textContent = t.symptomsLabel;
+            document.getElementById('age-label').textContent = t.ageLabel;
+            document.getElementById('severity-label').textContent = t.severityLabel;
+            document.getElementById('predict-btn').innerHTML = `<i class="fas fa-brain"></i> ${t.predictBtn}`;
+            document.getElementById('prediction-title').textContent = t.predictionTitle;
+            document.getElementById('predicted-time-label').textContent = t.predictedTimeLabel;
+            document.getElementById('confidence-label').textContent = t.confidenceLabel;
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Language selection
+            document.querySelectorAll('.language-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.language-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    selectedLanguage = this.dataset.lang;
+                    updateLanguage();
+                });
+            });
+        }
+
+        // Load queue statistics with AI analytics
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_URL}/patients/`);
+                if (response.ok) {
+                    const patients = await response.json();
+                    const uncalledPatients = patients.filter(p => !p.called);
+                    const avgWait = uncalledPatients.length > 0 
+                        ? Math.round(uncalledPatients.reduce((sum, p) => sum + p.eta, 0) / uncalledPatients.length)
+                        : 0;
+                    
+                    document.getElementById('queue-count').textContent = uncalledPatients.length;
+                    document.getElementById('avg-wait').textContent = avgWait;
+                    document.getElementById('stats').style.display = 'flex';
+                    
+                    // Load AI analytics
+                    await loadAIAnalytics();
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load AI analytics
+        async function loadAIAnalytics() {
+            try {
+                const response = await fetch(`${API_URL}/ai/queue-analytics`);
+                const analytics = await response.json();
+                
+                // Update AI confidence
+                const confidence = Math.round(analytics.ai_confidence * 100);
+                document.getElementById('ai-confidence').textContent = confidence + '%';
+                
+                // Show AI predictor
+                document.getElementById('ai-predictor').style.display = 'block';
+            } catch (error) {
+                console.error('Error loading AI analytics:', error);
+            }
+        }
+
+        // Predict wait time using AI
+        async function predictWaitTime() {
+            const symptoms = document.getElementById('symptoms-input').value;
+            const age = document.getElementById('age-input').value;
+            const severity = document.getElementById('severity-select').value;
+            
+            if (!symptoms || !age) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/ai/predict-wait-time?severity_level=${severity}&symptoms=${encodeURIComponent(symptoms)}&age=${age}`);
+                const prediction = await response.json();
+                
+                // Display prediction results
+                document.getElementById('predicted-time').textContent = prediction.predicted_wait_time + ' minutes';
+                document.getElementById('confidence-score').textContent = Math.round(prediction.confidence_score * 100) + '%';
+                
+                // Display insights
+                const insightsContainer = document.getElementById('prediction-insights');
+                insightsContainer.innerHTML = '<h5>AI Insights:</h5><ul>';
+                prediction.insights.forEach(insight => {
+                    insightsContainer.innerHTML += `<li>${insight}</li>`;
+                });
+                insightsContainer.innerHTML += '</ul>';
+                
+                document.getElementById('prediction-result').style.display = 'block';
+            } catch (error) {
+                console.error('Error predicting wait time:', error);
+                alert('Error predicting wait time. Please try again.');
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

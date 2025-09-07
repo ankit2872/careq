@@ -1,0 +1,9 @@
+{
+    "welcome": "👋 Welcome to CareQ!\nLet's get your token.\nPlease enter your *age*.",
+    "ask_symptoms": "Please list your symptoms, separated by commas (e.g., fever, cough, headache).",
+    "confirm_details": "Is this correct?\nAge: {age}\nSymptoms: {symptoms}\n(Yes/No)",
+    "thank_you_eta": "Thank you! Your token is *{token}*.\nYour estimated wait time is *{eta} minutes* (Severity: {severity}).\nYou will be notified when it's your turn.",
+    "invalid_age": "Please enter a valid age.",
+    "invalid_yes_no": "Please respond with 'Yes' or 'No'.",
+    "next_in_queue": "🔔 It's your turn next! Please proceed to the clinic for token *{token}*."
+}

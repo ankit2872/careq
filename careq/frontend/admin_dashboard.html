@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareQ Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 30px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 0 30px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+            font-size: 1.5em;
+            font-weight: 800;
+        }
+
+        .logo i {
+            font-size: 2em;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 20px;
+        }
+
+        .nav-item {
+            margin-bottom: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            padding: 25px 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5em;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .stat-title {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            color: white;
+        }
+
+        .stat-value {
+            color: white;
+            font-size: 2.5em;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .stat-change {
+            color: #4ecdc4;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        .queue-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            color: white;
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+
+        .patient-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .patient-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .patient-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+
+        .patient-card.called {
+            border-left: 4px solid #4ecdc4;
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        .patient-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .patient-name {
+            color: white;
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+
+        .patient-token {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9em;
+        }
+
+        .patient-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9em;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            color: white;
+        }
+
+        .patient-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.8em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .call-btn {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+        }
+
+        .call-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4);
+        }
+
+        .pdf-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .pdf-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .reset-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            color: white;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .analytics-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .chart-container {
+            height: 200px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .analytics-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .analytics-item:last-child {
+            border-bottom: none;
+        }
+
+        .analytics-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+        }
+
+        .analytics-value {
+            color: white;
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #4ecdc4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .empty-state i {
+            font-size: 4em;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .ai-insights-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 30px;
+        }
+
+        .ai-insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+        }
+
+        .ai-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb);
+        }
+
+        .ai-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .ai-card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .ai-card-header i {
+            font-size: 1.5em;
+            color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.2);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .ai-card-header h3 {
+            color: white;
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+
+        .ai-card-content {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+        }
+
+        .ai-insight-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #4ecdc4;
+        }
+
+        .ai-insight-title {
+            font-weight: 600;
+            color: #4ecdc4;
+            margin-bottom: 5px;
+        }
+
+        .ai-insight-content {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9em;
+        }
+
+        .ai-recommendation {
+            background: rgba(78, 205, 196, 0.1);
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .ai-recommendation-title {
+            font-weight: 600;
+            color: #4ecdc4;
+            margin-bottom: 5px;
+        }
+
+        .ai-recommendation-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .ai-recommendation-list li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .ai-recommendation-list li::before {
+            content: "•";
+            color: #4ecdc4;
+            position: absolute;
+            left: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .patient-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-hospital"></i>
+                    CareQ Admin
+                </div>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" data-section="dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="queue">
+                        <i class="fas fa-users"></i>
+                        Patient Queue
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="analytics">
+                        <i class="fas fa-chart-line"></i>
+                        Analytics
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="ai-insights">
+                        <i class="fas fa-brain"></i>
+                        AI Insights
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="settings">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        Back to Home
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h1>Admin Dashboard</h1>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" onclick="refreshData()">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                    <button class="btn btn-primary" onclick="exportData()">
+                        <i class="fas fa-download"></i>
+                        Export Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Total Patients</span>
+                        <div class="stat-icon" style="background: linear-gradient(45deg, #ff6b6b, #ee5a52);">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="total-patients">0</div>
+                    <div class="stat-change">+12% from yesterday</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">In Queue</span>
+                        <div class="stat-icon" style="background: linear-gradient(45deg, #4ecdc4, #44a08d);">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="queue-count">0</div>
+                    <div class="stat-change">Active patients</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Avg Wait Time</span>
+                        <div class="stat-icon" style="background: linear-gradient(45deg, #667eea, #764ba2);">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="avg-wait">0</div>
+                    <div class="stat-change">minutes</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Called Today</span>
+                        <div class="stat-icon" style="background: linear-gradient(45deg, #f093fb, #f5576c);">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="called-today">0</div>
+                    <div class="stat-change">+8% from yesterday</div>
+                </div>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="content-grid">
+                <!-- Queue Section -->
+                <div class="queue-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Patient Queue</h2>
+                        <button class="btn btn-primary" onclick="callNextPatient()">
+                            <i class="fas fa-bell"></i>
+                            Call Next
+                        </button>
+                    </div>
+                    
+                    <div class="loading" id="queue-loading">
+                        <div class="spinner"></div>
+                        <p>Loading patients...</p>
+                    </div>
+
+                    <div class="patient-list" id="patient-list">
+                        <!-- Patient cards will be inserted here -->
+                    </div>
+
+                    <div class="empty-state" id="empty-queue" style="display: none;">
+                        <i class="fas fa-user-friends"></i>
+                        <h3>No patients in queue</h3>
+                        <p>All patients have been called or no new registrations yet.</p>
+                    </div>
+                </div>
+
+                <!-- Analytics Section -->
+                <div class="analytics-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Analytics</h2>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Queue Distribution Chart</span>
+                    </div>
+
+                    <div class="analytics-item">
+                        <span class="analytics-label">High Priority</span>
+                        <span class="analytics-value" id="high-priority">0</span>
+                    </div>
+                    <div class="analytics-item">
+                        <span class="analytics-label">Medium Priority</span>
+                        <span class="analytics-value" id="medium-priority">0</span>
+                    </div>
+                    <div class="analytics-item">
+                        <span class="analytics-label">Low Priority</span>
+                        <span class="analytics-value" id="low-priority">0</span>
+                    </div>
+                    <div class="analytics-item">
+                        <span class="analytics-label">Peak Hour</span>
+                        <span class="analytics-value">2:00 PM</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Insights Section -->
+            <div class="ai-insights-section" id="ai-insights-section" style="display: none;">
+                <div class="section-header">
+                    <h2 class="section-title">🤖 AI Insights & Analysis</h2>
+                    <button class="btn btn-primary" onclick="loadAIInsights()">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh AI Analysis
+                    </button>
+                </div>
+
+                <div class="ai-insights-grid">
+                    <!-- Queue AI Analysis -->
+                    <div class="ai-card">
+                        <div class="ai-card-header">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>Queue Pattern Analysis</h3>
+                        </div>
+                        <div class="ai-card-content" id="queue-ai-analysis">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                                <p>Loading AI analysis...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Patient AI Analysis -->
+                    <div class="ai-card">
+                        <div class="ai-card-header">
+                            <i class="fas fa-user-md"></i>
+                            <h3>Patient Health Insights</h3>
+                        </div>
+                        <div class="ai-card-content" id="patient-ai-analysis">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                                <p>Loading patient insights...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Treatment Recommendations -->
+                    <div class="ai-card">
+                        <div class="ai-card-header">
+                            <i class="fas fa-pills"></i>
+                            <h3>Treatment Recommendations</h3>
+                        </div>
+                        <div class="ai-card-content" id="treatment-recommendations">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                                <p>Loading recommendations...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resource Optimization -->
+                    <div class="ai-card">
+                        <div class="ai-card-header">
+                            <i class="fas fa-cogs"></i>
+                            <h3>Resource Optimization</h3>
+                        </div>
+                        <div class="ai-card-content" id="resource-optimization">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                                <p>Loading optimization tips...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+        let patients = [];
+        let currentStats = {};
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+            setupWebSocket();
+            setupNavigation();
+        });
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                showLoading('queue-loading');
+                const response = await fetch(`${API_URL}/patients/`);
+                patients = await response.json();
+                updateStats();
+                renderPatientList();
+                hideLoading('queue-loading');
+            } catch (error) {
+                console.error('Error loading data:', error);
+                hideLoading('queue-loading');
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            const totalPatients = patients.length;
+            const queueCount = patients.filter(p => !p.called).length;
+            const calledToday = patients.filter(p => p.called).length;
+            const avgWait = queueCount > 0 ? 
+                Math.round(patients.filter(p => !p.called).reduce((sum, p) => sum + p.eta, 0) / queueCount) : 0;
+
+            // Priority distribution
+            const highPriority = patients.filter(p => p.severity_level === 'High').length;
+            const mediumPriority = patients.filter(p => p.severity_level === 'Medium').length;
+            const lowPriority = patients.filter(p => p.severity_level === 'Low').length;
+
+            document.getElementById('total-patients').textContent = totalPatients;
+            document.getElementById('queue-count').textContent = queueCount;
+            document.getElementById('avg-wait').textContent = avgWait;
+            document.getElementById('called-today').textContent = calledToday;
+            document.getElementById('high-priority').textContent = highPriority;
+            document.getElementById('medium-priority').textContent = mediumPriority;
+            document.getElementById('low-priority').textContent = lowPriority;
+
+            currentStats = { totalPatients, queueCount, calledToday, avgWait };
+        }
+
+        // Render patient list
+        function renderPatientList() {
+            const patientList = document.getElementById('patient-list');
+            const emptyQueue = document.getElementById('empty-queue');
+            
+            if (patients.length === 0) {
+                patientList.style.display = 'none';
+                emptyQueue.style.display = 'block';
+                return;
+            }
+
+            patientList.style.display = 'block';
+            emptyQueue.style.display = 'none';
+
+            // Sort patients by priority and queue time
+            const sortedPatients = patients.sort((a, b) => {
+                if (a.called !== b.called) return a.called - b.called;
+                if (a.triage_score !== b.triage_score) return b.triage_score - a.triage_score;
+                return new Date(a.queued_at) - new Date(b.queued_at);
+            });
+
+            patientList.innerHTML = sortedPatients.map(patient => `
+                <div class="patient-card ${patient.called ? 'called' : ''}">
+                    <div class="patient-header">
+                        <div class="patient-name">${patient.name}</div>
+                        <div class="patient-token">Token #${patient.id}</div>
+                    </div>
+                    <div class="patient-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Age</div>
+                            <div class="detail-value">${patient.age} years</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Severity</div>
+                            <div class="detail-value">${patient.severity_level}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Wait Time</div>
+                            <div class="detail-value">${patient.eta} min</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Queued At</div>
+                            <div class="detail-value">${new Date(patient.queued_at).toLocaleTimeString()}</div>
+                        </div>
+                    </div>
+                    <div class="patient-actions">
+                        ${!patient.called ? 
+                            `<button class="action-btn call-btn" onclick="callPatient(${patient.id})">
+                                <i class="fas fa-bell"></i> Call
+                            </button>` : 
+                            `<button class="action-btn reset-btn" onclick="resetPatient(${patient.id})">
+                                <i class="fas fa-undo"></i> Reset
+                            </button>`
+                        }
+                        <button class="action-btn pdf-btn" onclick="generatePDF(${patient.id})">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Call patient
+        async function callPatient(patientId) {
+            try {
+                await fetch(`${API_URL}/patients/${patientId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ called: true })
+                });
+                loadDashboardData();
+            } catch (error) {
+                console.error('Error calling patient:', error);
+            }
+        }
+
+        // Reset patient
+        async function resetPatient(patientId) {
+            try {
+                await fetch(`${API_URL}/patients/${patientId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ called: false })
+                });
+                loadDashboardData();
+            } catch (error) {
+                console.error('Error resetting patient:', error);
+            }
+        }
+
+        // Generate PDF
+        async function generatePDF(patientId) {
+            try {
+                const response = await fetch(`${API_URL}/generate_token_pdf/${patientId}`);
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `token_${patientId}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                }
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+            }
+        }
+
+        // Call next patient
+        function callNextPatient() {
+            const nextPatient = patients.find(p => !p.called);
+            if (nextPatient) {
+                callPatient(nextPatient.id);
+            }
+        }
+
+        // Refresh data
+        function refreshData() {
+            loadDashboardData();
+        }
+
+        // Export data
+        function exportData() {
+            const dataStr = JSON.stringify(patients, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'careq_patients.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Setup WebSocket for real-time updates
+        function setupWebSocket() {
+            const ws = new WebSocket(`ws://127.0.0.1:8000/ws`);
+            
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                if (data.type === "queue_update") {
+                    patients = data.patients;
+                    updateStats();
+                    renderPatientList();
+                }
+            };
+
+            ws.onopen = function() {
+                console.log('WebSocket connected');
+            };
+
+            ws.onclose = function() {
+                console.log('WebSocket disconnected');
+            };
+        }
+
+        // Setup navigation
+        function setupNavigation() {
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    if (this.getAttribute('href') === '#') {
+                        e.preventDefault();
+                        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Show/hide sections based on navigation
+                        const section = this.getAttribute('data-section');
+                        showSection(section);
+                    }
+                });
+            });
+        }
+
+        // Show specific section
+        function showSection(section) {
+            // Hide all sections
+            document.getElementById('queue-section').style.display = 'none';
+            document.getElementById('analytics-section').style.display = 'none';
+            document.getElementById('ai-insights-section').style.display = 'none';
+            
+            // Show selected section
+            if (section === 'queue') {
+                document.getElementById('queue-section').style.display = 'block';
+            } else if (section === 'analytics') {
+                document.getElementById('analytics-section').style.display = 'block';
+            } else if (section === 'ai-insights') {
+                document.getElementById('ai-insights-section').style.display = 'block';
+                loadAIInsights();
+            }
+        }
+
+        // Load AI insights
+        async function loadAIInsights() {
+            try {
+                // Load queue AI insights
+                const queueResponse = await fetch(`${API_URL}/ai/queue-insights`);
+                const queueData = await queueResponse.json();
+                displayQueueAIAnalysis(queueData.queue_analysis);
+                
+                // Load patient AI analysis for first few patients
+                const patientsResponse = await fetch(`${API_URL}/patients/`);
+                const patients = await patientsResponse.json();
+                
+                if (patients.length > 0) {
+                    const firstPatient = patients[0];
+                    const patientAnalysisResponse = await fetch(`${API_URL}/ai/patient-analysis/${firstPatient.id}`);
+                    const patientAnalysis = await patientAnalysisResponse.json();
+                    displayPatientAIAnalysis(patientAnalysis);
+                }
+                
+            } catch (error) {
+                console.error('Error loading AI insights:', error);
+                displayAIError();
+            }
+        }
+
+        // Display queue AI analysis
+        function displayQueueAIAnalysis(analysis) {
+            const container = document.getElementById('queue-ai-analysis');
+            container.innerHTML = `
+                <div class="ai-insight-item">
+                    <div class="ai-insight-title">Common Symptoms</div>
+                    <div class="ai-insight-content">${analysis.common_symptoms ? analysis.common_symptoms.join(', ') : 'No data available'}</div>
+                </div>
+                <div class="ai-insight-item">
+                    <div class="ai-insight-title">Peak Conditions</div>
+                    <div class="ai-insight-content">${analysis.peak_conditions ? analysis.peak_conditions.join(', ') : 'No data available'}</div>
+                </div>
+                <div class="ai-insight-item">
+                    <div class="ai-insight-title">Staffing Insights</div>
+                    <div class="ai-insight-content">${analysis.staffing_insights || 'No specific recommendations'}</div>
+                </div>
+                <div class="ai-recommendation">
+                    <div class="ai-recommendation-title">Resource Recommendations</div>
+                    <ul class="ai-recommendation-list">
+                        ${analysis.resource_recommendations ? analysis.resource_recommendations.map(rec => `<li>${rec}</li>`).join('') : '<li>No specific recommendations</li>'}
+                    </ul>
+                </div>
+            `;
+        }
+
+        // Display patient AI analysis
+        function displayPatientAIAnalysis(analysis) {
+            const container = document.getElementById('patient-ai-analysis');
+            const aiAnalysis = analysis.ai_analysis;
+            const healthInsights = analysis.health_insights;
+            
+            container.innerHTML = `
+                <div class="ai-insight-item">
+                    <div class="ai-insight-title">Potential Conditions</div>
+                    <div class="ai-insight-content">${aiAnalysis.potential_conditions ? aiAnalysis.potential_conditions.join(', ') : 'No specific conditions identified'}</div>
+                </div>
+                <div class="ai-insight-item">
+                    <div class="ai-insight-title">Health Score</div>
+                    <div class="ai-insight-content">${Math.round(healthInsights.health_score * 100)}%</div>
+                </div>
+                <div class="ai-insight-item">
+                    <div class="ai-insight-title">Risk Factors</div>
+                    <div class="ai-insight-content">${healthInsights.risk_factors ? healthInsights.risk_factors.join(', ') : 'No specific risk factors'}</div>
+                </div>
+                <div class="ai-recommendation">
+                    <div class="ai-recommendation-title">Preventive Measures</div>
+                    <ul class="ai-recommendation-list">
+                        ${healthInsights.preventive_measures ? healthInsights.preventive_measures.map(measure => `<li>${measure}</li>`).join('') : '<li>No specific measures</li>'}
+                    </ul>
+                </div>
+            `;
+            
+            // Display treatment recommendations
+            displayTreatmentRecommendations(analysis.treatment_recommendations);
+        }
+
+        // Display treatment recommendations
+        function displayTreatmentRecommendations(recommendations) {
+            const container = document.getElementById('treatment-recommendations');
+            container.innerHTML = `
+                <div class="ai-insight-item">
+                    <div class="ai-insight-title">Immediate Actions</div>
+                    <div class="ai-insight-content">${recommendations.immediate_actions ? recommendations.immediate_actions.join(', ') : 'No specific actions'}</div>
+                </div>
+                <div class="ai-insight-item">
+                    <div class="ai-insight-title">Recovery Timeline</div>
+                    <div class="ai-insight-content">${recommendations.recovery_timeline || 'Varies based on condition'}</div>
+                </div>
+                <div class="ai-recommendation">
+                    <div class="ai-recommendation-title">Lifestyle Changes</div>
+                    <ul class="ai-recommendation-list">
+                        ${recommendations.lifestyle_changes ? recommendations.lifestyle_changes.map(change => `<li>${change}</li>`).join('') : '<li>No specific changes</li>'}
+                    </ul>
+                </div>
+                <div class="ai-recommendation">
+                    <div class="ai-recommendation-title">Follow-up Care</div>
+                    <ul class="ai-recommendation-list">
+                        ${recommendations.follow_up_care ? recommendations.follow_up_care.map(care => `<li>${care}</li>`).join('') : '<li>Regular follow-up recommended</li>'}
+                    </ul>
+                </div>
+            `;
+            
+            // Display resource optimization
+            displayResourceOptimization();
+        }
+
+        // Display resource optimization
+        function displayResourceOptimization() {
+            const container = document.getElementById('resource-optimization');
+            container.innerHTML = `
+                <div class="ai-insight-item">
+                    <div class="ai-insight-title">Equipment Needs</div>
+                    <div class="ai-insight-content">Basic medical equipment, monitoring devices</div>
+                </div>
+                <div class="ai-insight-item">
+                    <div class="ai-insight-title">Staffing Recommendations</div>
+                    <div class="ai-insight-content">Monitor patient load and adjust staffing accordingly</div>
+                </div>
+                <div class="ai-recommendation">
+                    <div class="ai-recommendation-title">Quality Improvements</div>
+                    <ul class="ai-recommendation-list">
+                        <li>Regular staff training on AI insights</li>
+                        <li>Implement patient feedback collection</li>
+                        <li>Use AI predictions for resource planning</li>
+                        <li>Monitor AI confidence scores</li>
+                    </ul>
+                </div>
+            `;
+        }
+
+        // Display AI error
+        function displayAIError() {
+            const containers = ['queue-ai-analysis', 'patient-ai-analysis', 'treatment-recommendations', 'resource-optimization'];
+            containers.forEach(containerId => {
+                const container = document.getElementById(containerId);
+                container.innerHTML = `
+                    <div class="ai-insight-item">
+                        <div class="ai-insight-title">AI Service Unavailable</div>
+                        <div class="ai-insight-content">AI analysis is temporarily unavailable. Please try again later.</div>
+                    </div>
+                `;
+            });
+        }
+
+        // Utility functions
+        function showLoading(elementId) {
+            document.getElementById(elementId).style.display = 'block';
+        }
+
+        function hideLoading(elementId) {
+            document.getElementById(elementId).style.display = 'none';
+        }
+    </script>
+</body>
+</html>
